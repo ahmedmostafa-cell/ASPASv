@@ -1,0 +1,108 @@
+
+<h1>{{title}}</h1>
+<button kendoButton (click)="Add()" style="background-color: green; color: white; margin-bottom: 16px;">
+  Add Client
+</button>
+<kendo-grid
+[kendoGridBinding]="clients"
+[pageSize]="10"
+[pageable]="true"
+[sortable]="true"
+[filterable]="true"
+[groupable]="true"
+[height]="420"
+>
+<kendo-grid-column field="firstName" [width]="140"></kendo-grid-column>
+<kendo-grid-column field="lastName" [width]="120"></kendo-grid-column>
+<kendo-grid-column field="emailAddress" [width]="100"></kendo-grid-column>
+<kendo-grid-column field="phoneNumber" [width]="130"></kendo-grid-column>
+<kendo-grid-column [hidden]="true"   field="id" [width]="130"></kendo-grid-column>
+<kendo-grid-column [width]="70" title="Actions">
+  <ng-template kendoGridCellTemplate let-dataItem>
+    <button kendoButton (click)="Edit(dataItem)" style="background-color: blue; color: white;">
+      Edit
+    </button>
+    <button kendoButton (click)="Delete(dataItem)" style="background-color: red; color: white; margin-left: 8px;">
+      Delete
+    </button>
+  </ng-template>
+</kendo-grid-column>
+</kendo-grid>
+
+<div class="example-wrapper">
+  <kendo-dialog title="Clients" *ngIf="dialogOpened" (close)="close()" [minWidth]="250" [width]="450" [height]="400">
+    <div class="k-dialog-content">
+      <form class="k-form k-form-md" [formGroup]="registerForm">
+        <fieldset class="k-form-fieldset">
+          <legend class="k-form-legend">{{ isEditing ? 'Edit Client' : 'Add New Client' }}</legend>
+          <input type="hidden" formControlName="id">
+          <kendo-formfield>
+            <kendo-label
+              labelCssClass="k-form-label"
+              [for]="firstName"
+              text="First Name"
+            ></kendo-label>
+            <kendo-textbox
+              formControlName="firstName"
+              #firstName
+              required
+            ></kendo-textbox>
+
+            <kendo-formhint>Your first name</kendo-formhint>
+            <kendo-formerror>Error: First name is required</kendo-formerror>
+          </kendo-formfield>
+          <kendo-formfield>
+            <kendo-label
+              labelCssClass="k-form-label"
+              [for]="lastName"
+              text="Last Name"
+            ></kendo-label>
+            <kendo-textbox
+              formControlName="lastName"
+              #lastName
+              required
+            ></kendo-textbox>
+
+            <kendo-formhint>Your last name</kendo-formhint>
+            <kendo-formerror>Error: Last name is required</kendo-formerror>
+          </kendo-formfield>
+          <kendo-formfield>
+            <kendo-label
+              labelCssClass="k-form-label"
+              [for]="email"
+              text="Email"
+            ></kendo-label>
+            <kendo-textbox
+              formControlName="emailAddress"
+              #email
+              required
+            ></kendo-textbox>
+
+            <kendo-formhint>Your active email</kendo-formhint>
+            <kendo-formerror>Error: Not valid email format</kendo-formerror>
+          </kendo-formfield>
+          <kendo-formfield>
+            <kendo-label
+              labelCssClass="k-form-label"
+              [for]="phoneNumber"
+              text="Number"
+            ></kendo-label>
+            <kendo-textbox
+              formControlName="phoneNumber"
+              #phoneNumber
+              required
+            ></kendo-textbox>
+
+            <kendo-formhint>Your phoneNumber</kendo-formhint>
+          </kendo-formfield>
+          <div class="k-form-buttons">
+            <button kendoButton themeColor="primary" [disabled]="registerForm.invalid" (click)="submitForm()">
+              {{ isEditing ? 'Update' : 'Submit' }}
+            </button>
+            <button kendoButton (click)="clearForm()">Clear</button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </kendo-dialog>
+</div>

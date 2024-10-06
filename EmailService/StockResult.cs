@@ -8,17 +8,17 @@ namespace EmailService
 {
     public class StockResult
     {
-        public int Id { get; set; } // Primary key
-        public string T { get; set; } // Stock symbol
-        public int V { get; set; } // Volume
-        public decimal Vw { get; set; } // Volume-weighted average price
-        public decimal O { get; set; } // Opening price
-        public decimal C { get; set; } // Closing price
-        public decimal H { get; set; } // Highest price
-        public decimal L { get; set; } // Lowest price
-        public DateTime Timestamp { get; set; } // Converted from Unix timestamp
-        public int N { get; set; } // Number of transactions
+        public int Id { get; set; }
+        public string T { get; set; }
+        public int V { get; set; }
+        public decimal Vw { get; set; }
+        public decimal O { get; set; }
+        public decimal C { get; set; }
+        public decimal H { get; set; }
+        public decimal L { get; set; }
+        public DateTime Timestamp { get; set; }
+        public int N { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Default to current UTC time
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

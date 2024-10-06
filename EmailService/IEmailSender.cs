@@ -12,6 +12,7 @@ namespace EmailService
         Task SendEmailAsync(Message message, List<StockResult> results , string clientName);
 
         Task SendEmailAsyncToCustomerWithBookingDetails(Message message, Guid id);
+
         Task SendEmailAsyncToCustomer(Message message);
 
         Task SendEmailAsyncToCustomerNotConfirmedBooking(Message message, string Comment, string CustomerEmail);

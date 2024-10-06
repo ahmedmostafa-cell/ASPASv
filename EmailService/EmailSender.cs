@@ -13,7 +13,6 @@ namespace EmailService
     {
         private readonly EmailConfiguration _emailConfig;
 
-
         public EmailSender(EmailConfiguration emailConfig)
         {
             _emailConfig = emailConfig;
@@ -22,33 +21,26 @@ namespace EmailService
         public void SendEmail(Message message, List<StockResult> results , string clientName)
         {
             var emailMessage = CreateEmailMessage(message, results , clientName);
-
             Send(emailMessage);
         }
 
         public async Task SendEmailAsync(Message message, List<StockResult> results , string clientName)
         {
             var mailMessage = CreateEmailMessage(message, results , clientName);
-
             await SendAsync(mailMessage);
         }
-
 
         public async Task SendEmailAsyncToCustomer(Message message)
         {
             var mailMessage = CreateEmailMessageToCustomer(message);
-
             await SendAsync(mailMessage);
         }
-
 
         public async Task SendEmailAsyncToCustomerWithBookingDetails(Message message, Guid id)
         {
             var mailMessage = CreateEmailMessageToCustomerWithBookingDetails(message, id);
-
             await SendAsync(mailMessage);
         }
-
 
         public async Task SendEmailAsyncToCustomerNotConfirmedBooking(Message message, string Comment, string CustomerEmail)
         {
@@ -56,11 +48,6 @@ namespace EmailService
 
             await SendAsync(mailMessage);
         }
-
-
-
-
-
 
         private void Send(MimeMessage mailMessage)
         {
@@ -77,7 +64,6 @@ namespace EmailService
                 }
                 catch
                 {
-                    //log an error message or throw an exception, or both.
                     throw;
                 }
                 finally
@@ -96,15 +82,12 @@ namespace EmailService
                 {
                     await client.ConnectAsync(_emailConfig.SmtpServer, _emailConfig.Port, false);
                     client.CheckCertificateRevocation = false;
-
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
                     await client.AuthenticateAsync(_emailConfig.UserName, _emailConfig.Password);
-
                     await client.SendAsync(mailMessage);
                 }
                 catch
                 {
-                    //log an error message or throw an exception, or both.
                     throw;
                 }
                 finally
@@ -115,26 +98,14 @@ namespace EmailService
             }
         }
 
-
-
-
-
         private MimeMessage CreateEmailMessage(Message message, List<StockResult> results , string clientName)
         {
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress(_emailConfig.From, _emailConfig.From));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
-
             string body = CreateBody(results ,  clientName);
-
-
-
-
-
-
             var bodyBuilder = new BodyBuilder { HtmlBody = CreateBody(results , clientName) };
-
             if (message.Attachments != null && message.Attachments.Any())
             {
                 byte[] fileBytes;
@@ -145,17 +116,13 @@ namespace EmailService
                         attachment.CopyTo(ms);
                         fileBytes = ms.ToArray();
                     }
-
                     bodyBuilder.Attachments.Add(attachment.FileName, fileBytes, ContentType.Parse(attachment.ContentType));
                 }
             }
-
             emailMessage.Body = bodyBuilder.ToMessageBody();
+
             return emailMessage;
         }
-
-
-
 
         private MimeMessage CreateEmailMessageToCustomer(Message message)
         {
@@ -163,16 +130,8 @@ namespace EmailService
             emailMessage.From.Add(new MailboxAddress(_emailConfig.From, "Sender Email Address"));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
-
             string body = CreateBodyToAdmin();
-
-
-
-
-
-
             var bodyBuilder = new BodyBuilder { HtmlBody = CreateBodyToAdmin() };
-
             if (message.Attachments != null && message.Attachments.Any())
             {
                 byte[] fileBytes;
@@ -183,34 +142,21 @@ namespace EmailService
                         attachment.CopyTo(ms);
                         fileBytes = ms.ToArray();
                     }
-
                     bodyBuilder.Attachments.Add(attachment.FileName, fileBytes, ContentType.Parse(attachment.ContentType));
                 }
             }
-
             emailMessage.Body = bodyBuilder.ToMessageBody();
+
             return emailMessage;
         }
-
-
-
-
         private MimeMessage CreateEmailMessageToCustomerWithBookingDetails(Message message, Guid id)
         {
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress(_emailConfig.From, "Sender Email Address"));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
-
             string body = CreateBodyToAdminWithBookingDetails(id);
-
-
-
-
-
-
             var bodyBuilder = new BodyBuilder { HtmlBody = CreateBodyToAdminWithBookingDetails(id) };
-
             if (message.Attachments != null && message.Attachments.Any())
             {
                 byte[] fileBytes;
@@ -221,12 +167,11 @@ namespace EmailService
                         attachment.CopyTo(ms);
                         fileBytes = ms.ToArray();
                     }
-
                     bodyBuilder.Attachments.Add(attachment.FileName, fileBytes, ContentType.Parse(attachment.ContentType));
                 }
             }
-
             emailMessage.Body = bodyBuilder.ToMessageBody();
+
             return emailMessage;
         }
 
@@ -236,16 +181,8 @@ namespace EmailService
             emailMessage.From.Add(new MailboxAddress(_emailConfig.From, "Sender Email Address"));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
-
             string body = CreateBodyToCustomerNotConfirmed(Comment, CustomerEmail);
-
-
-
-
-
-
             var bodyBuilder = new BodyBuilder { HtmlBody = CreateBodyToCustomerNotConfirmed(Comment, CustomerEmail) };
-
             if (message.Attachments != null && message.Attachments.Any())
             {
                 byte[] fileBytes;
@@ -256,45 +193,22 @@ namespace EmailService
                         attachment.CopyTo(ms);
                         fileBytes = ms.ToArray();
                     }
-
                     bodyBuilder.Attachments.Add(attachment.FileName, fileBytes, ContentType.Parse(attachment.ContentType));
                 }
             }
-
             emailMessage.Body = bodyBuilder.ToMessageBody();
+
             return emailMessage;
         }
-
-
-
-
-
-
-
         private string CreateBody(List<StockResult> results , string clientName)
         {
             string Body = string.Empty;
-
             using (StreamReader reader = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Templates", "SendEmail.html")))
             {
                 Body = reader.ReadToEnd();
             }
-
-            Body = Body.Replace("bookingNumber", "ahmed");
+          
             Body = Body.Replace("customerName", clientName);
-            Body = Body.Replace("customerPhone", "ahmed");
-            Body = Body.Replace("customerEmail", "ahmed");
-            Body = Body.Replace("flightDate", "ahmed");
-            Body = Body.Replace("flightNumber", "ahmed");
-            Body = Body.Replace("flightType", "ahmed");
-            Body = Body.Replace("destination", "ahmed");
-            Body = Body.Replace("airport", "ahmed");
-            Body = Body.Replace("package", "ahmed");
-            Body = Body.Replace("adult", "ahmed");
-            Body = Body.Replace("child", "ahmed");
-            Body = Body.Replace("infant", "ahmed");
-            Body = Body.Replace("total", "ahmed");
-
             StringBuilder stockTable = new StringBuilder();
             foreach (var result in results)
             {
@@ -311,58 +225,41 @@ namespace EmailService
                 <td>{result.CreatedAt}</td>
             </tr>");
             }
-
-            // Replace placeholder for stock data table in the HTML
             Body = Body.Replace("{{StockTable}}", stockTable.ToString());
-
 
             return Body;
         }
-
-
-
 
         private string CreateBodyToAdmin()
         {
             string Body = string.Empty;
-
             using (StreamReader reader = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Templates", "SendEmailToCustomer.html")))
             {
                 Body = reader.ReadToEnd();
             }
-
-
 
             return Body;
         }
 
-
         private string CreateBodyToAdminWithBookingDetails(Guid id)
         {
             string Body = string.Empty;
-
             using (StreamReader reader = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Templates", "SendEmailToCustomer.html")))
             {
                 Body = reader.ReadToEnd();
             }
-
             Body = Body.Replace("InvoiceNUMBER", id.ToString());
 
             return Body;
         }
 
-
-
-
         private string CreateBodyToCustomerNotConfirmed(string Comment, string CustomerEmail)
         {
             string Body = string.Empty;
-
             using (StreamReader reader = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Templates", "SendEmailToCustomer NotConfirmed.html")))
             {
                 Body = reader.ReadToEnd();
             }
-
             Body = Body.Replace("comment", Comment);
 
             return Body;

@@ -3,6 +3,8 @@ using API.Entities;
 using System;
 using Newtonsoft.Json.Linq;
 using EmailService;
+using Microsoft.EntityFrameworkCore;
+using static System.Formats.Asn1.AsnWriter;
 namespace API.Services
 {
     public class ApiDataService : BackgroundService
@@ -36,16 +38,11 @@ namespace API.Services
             }
         }
 
-        public async Task<List<EmailService.StockResult>> SaveStockResultsAsync(JToken jsonResponse)
+        public async Task<List<EmailService.StockResult>> StockResultsToSendEmailAsync(JToken jsonResponse)
         {
             var resultsToSendEmail = new List<EmailService.StockResult>();
-
-           
-
-            // Loop through each result in the JSON array
             foreach (var result in jsonResponse)
             {
-                // Create a new StockResult object
                 var stockResult = new EmailService.StockResult
                 {
                     T = result["T"].ToString(),
@@ -58,37 +55,18 @@ namespace API.Services
                     N = Convert.ToInt32(result["n"]),
                     Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(result["t"])).UtcDateTime // Convert Unix timestamp to DateTime
                 };
-
-                // Add the stock result to the list
                 resultsToSendEmail.Add(stockResult);
             }
 
-            // Return the list of stock results
             return resultsToSendEmail;
         }
 
-        private async Task FetchApiDataAndNotifyClients()
+        public async Task StockResultsToSaveDatabaseAsync(JToken jsonResponse)
         {
-            using (var scope = _scopeFactory.CreateScope())
+            using (var scope = _scopeFactory.CreateScope()) 
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-                var httpClient = _httpClientFactory.CreateClient();
-
-                var apiUrl = _configuration["AppSettings:ApiUrl"];
-                var apiKey = _configuration["AppSettings:ApiKey"];
-
-                // Fetch data from the API
-                var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
-                request.Headers.Add("Authorization", $"Bearer {apiKey}");
-                var response = await httpClient.SendAsync(request);
-                var apiData = await response.Content.ReadAsStringAsync();
-                var jsonResponse = JObject.Parse(apiData);
-                var resultsToSaveDatabase = jsonResponse["results"];
-                var resultsToSendEmail = await SaveStockResultsAsync(resultsToSaveDatabase);
-                var clients = dbContext.Clients.ToList();
-
-                // Save the data to the database
-                foreach (var result in resultsToSaveDatabase)
+                foreach (var result in jsonResponse)
                 {
                     API.Entities.StockResult stockResult = new API.Entities.StockResult
                     {
@@ -106,27 +84,40 @@ namespace API.Services
                     dbContext.StockResults.Add(stockResult);
                 }
                 await dbContext.SaveChangesAsync();
+            }
+        }
 
-                // Get clients and send them emails
-               
+        private async Task FetchApiDataAndNotifyClients()
+        {
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                var httpClient = _httpClientFactory.CreateClient();
+                var apiUrl = _configuration["AppSettings:ApiUrl"];
+                var apiKey = _configuration["AppSettings:ApiKey"];
+                var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
+                request.Headers.Add("Authorization", $"Bearer {apiKey}");
+                var response = await httpClient.SendAsync(request);
+                var apiData = await response.Content.ReadAsStringAsync();
+                var jsonResponse = JObject.Parse(apiData);
+                var results = jsonResponse["results"];
+                var resultsToSendEmail = await StockResultsToSendEmailAsync(results);
+                await StockResultsToSaveDatabaseAsync(results);
+                var clients = dbContext.Clients.ToList();
                 foreach (var client in clients)
                 {
-                    // Logic to send email
                     await SendEmailToClient(client, resultsToSendEmail);
-                   
                 }
             }
         }
 
         private Task SendEmailToClient(Client client, List<EmailService.StockResult> results)
         {
-            
             _logger.LogInformation($"Sending email to {client.EmailAddress}");
             IFormFileCollection files = null;
-            MySearch mysearch = new MySearch();
             var messages = new Message(new string[] { client.EmailAddress }, "Email From ASAP Systems " , "This is the content from our async email. i am happy", files);
              _emailSender.SendEmailAsync(messages, results , client.FirstName);
-            // Add your email sending logic here
+      
             return Task.CompletedTask;
         }
     }

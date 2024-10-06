@@ -35,10 +35,10 @@ import { ToastrModule } from 'ngx-toastr';
     LabelModule,
     InputsModule,
     ToastrModule.forRoot({
-      timeOut: 3000, // Display for 3 seconds
-      positionClass: 'toast-bottom-right', // Position (e.g., bottom-right, top-left)
-      preventDuplicates: true, // Prevent showing duplicate toasts
-      progressBar: true, // Show progress bar
+      timeOut: 3000,
+      positionClass: 'toast-bottom-right',
+      preventDuplicates: true,
+      progressBar: true,
     }),
     
   ],

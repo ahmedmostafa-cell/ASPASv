@@ -1,8 +1,7 @@
-import { HttpClient } from '@angular/common/http';
 import { Component , OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr'; // Import ToastrService
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { ClientService } from './client.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -23,7 +22,7 @@ export class AppComponent implements OnInit {
   public dialogOpened = false;
   public isEditing = false;  
 
-  constructor(private http : HttpClient , private toastr :ToastrService){};
+  constructor(private toastr :ToastrService , private clientService : ClientService ){};
 
   ngOnInit(): void {
    
@@ -33,15 +32,14 @@ export class AppComponent implements OnInit {
 
   public GetClients() 
   {
-    this.http.get('http://localhost:5000/api/Client').subscribe({
-      next: response =>  
-        {
-          this.clients = response;
-          console.log(this.clients);
-        },
+    this.clientService.getClients().subscribe({
+      next: response => {
+        this.clients = response;
+        console.log(this.clients);
+      },
       error: error => console.log(error),
       complete: () => console.log('Request has completed')
-    })
+    });
   }
 
   public Edit(dataitem: any): void {
@@ -58,15 +56,12 @@ export class AppComponent implements OnInit {
   
   public Delete(dataitem: any): void {
     const clientId = dataitem.id; 
-    const url = `http://localhost:5000/api/Client/${clientId}`;
-  
-    this.http.delete(url).subscribe(
+    this.clientService.deleteClient(clientId).subscribe(
       response => {
         console.log("Delete successful", response);
         this.toastr.success("Client deleted successfully.", "Success");
         this.GetClients();
         this.clearForm();
-        
       },
       error => {
         const errorMessage = error.error?.message || "An unexpected error occurred.";
@@ -93,34 +88,32 @@ export class AppComponent implements OnInit {
       this.registerForm.markAllAsTouched();
       return;
     }
+    
     this.registerForm.markAllAsTouched();
     console.log(this.registerForm);
-    if(!this.isEditing) 
-      {
-        this.registerForm.value['id']=1;
-        console.log(this.registerForm.value);
-        this.http.post('http://localhost:5000/api/Client', this.registerForm.value)
-        .subscribe(
-          response => {
-            console.log('Server Response:', response);
-            this.GetClients();
-            this.toastr.info("The Client has been registered" , "Client added");
-            this.dialogOpened = false;
-            this.clearForm();
-          },
-          error => {
-            const errorMessage = error.error?.message || "An unexpected error occurred.";
-            this.toastr.error(errorMessage, "Client not added");
-            this.clearForm();
-          }
-        );
-        this.dialogOpened = false;
-    }
-    else 
-    {
-      console.log(this.registerForm.value)
-      this.http.put(`http://localhost:5000/api/Client/${this.registerForm.value['id']}`, this.registerForm.value)
-      .subscribe(
+    if (!this.isEditing) {
+      this.registerForm.value['id'] = 1; // Set a default ID
+      console.log(this.registerForm.value);
+
+      this.clientService.addClient(this.registerForm.value).subscribe(
+        response => {
+          console.log('Server Response:', response);
+          this.GetClients();
+          this.toastr.info("The Client has been registered", "Client added");
+          this.dialogOpened = false;
+          this.clearForm();
+        },
+        error => {
+          const errorMessage = error.error?.message || "An unexpected error occurred.";
+          this.toastr.error(errorMessage, "Client not added");
+          this.clearForm();
+        }
+      );
+
+    } else {
+      console.log(this.registerForm.value);
+
+      this.clientService.updateClient(this.registerForm.value['id'], this.registerForm.value).subscribe(
         response => {
           console.log('Server Response:', response);
           this.GetClients();

@@ -1,0 +1,13 @@
+C:\ASPASv\EmailService\obj\Debug\net8.0\EmailService.csproj.AssemblyReference.cache
+C:\ASPASv\EmailService\obj\Debug\net8.0\EmailService.GeneratedMSBuildEditorConfig.editorconfig
+C:\ASPASv\EmailService\obj\Debug\net8.0\EmailService.AssemblyInfoInputs.cache
+C:\ASPASv\EmailService\obj\Debug\net8.0\EmailService.AssemblyInfo.cs
+C:\ASPASv\EmailService\obj\Debug\net8.0\EmailService.csproj.CoreCompileInputs.cache
+C:\ASPASv\EmailService\obj\Debug\net8.0\EmailService.sourcelink.json
+C:\ASPASv\EmailService\bin\Debug\net8.0\EmailService.deps.json
+C:\ASPASv\EmailService\bin\Debug\net8.0\EmailService.dll
+C:\ASPASv\EmailService\bin\Debug\net8.0\EmailService.pdb
+C:\ASPASv\EmailService\obj\Debug\net8.0\EmailService.dll
+C:\ASPASv\EmailService\obj\Debug\net8.0\refint\EmailService.dll
+C:\ASPASv\EmailService\obj\Debug\net8.0\EmailService.pdb
+C:\ASPASv\EmailService\obj\Debug\net8.0\ref\EmailService.dll

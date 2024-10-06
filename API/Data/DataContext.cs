@@ -14,6 +14,7 @@ namespace API.Data
             
         }
         public DbSet<Client> Clients{ get; set; }
-        
+        public DbSet<StockResult> StockResults { get; set; }
+
     }
 }

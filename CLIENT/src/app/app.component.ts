@@ -69,8 +69,8 @@ export class AppComponent implements OnInit {
         
       },
       error => {
-        console.error("Delete failed", error);
-        this.toastr.error("Error deleting client: " + error.message, "Error");
+        const errorMessage = error.error?.message || "An unexpected error occurred.";
+        this.toastr.error(errorMessage, "Client not deleted");
         this.clearForm();
       }
     );
@@ -109,8 +109,8 @@ export class AppComponent implements OnInit {
             this.clearForm();
           },
           error => {
-            console.error('Error occurred:', error);
-            this.toastr.error("Email already has been registered before" , "Client not added");
+            const errorMessage = error.error?.message || "An unexpected error occurred.";
+            this.toastr.error(errorMessage, "Client not added");
             this.clearForm();
           }
         );
@@ -130,8 +130,8 @@ export class AppComponent implements OnInit {
           this.isEditing = false;
         },
         error => {
-          console.error('Error occurred:', error);
-          this.toastr.error("Error updating client", "Client not updated");
+          const errorMessage = error.error?.message || "An unexpected error occurred.";
+          this.toastr.error(errorMessage, "Client not updated");
           this.clearForm();
         }
       );
